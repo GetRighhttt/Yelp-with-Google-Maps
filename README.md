@@ -1,6 +1,8 @@
 # Tampa Guide
 
-An Android app for finding businesses by location through Yelp and viewing their locations on Google Maps.
+Tampa Guide began in 2023 as a project to learn how to use Yelp and Google Maps in an Android app. I later used the Maps work from this project to build the maps in Recipe Compose.
+
+The app originally searched around Tampa. It now lets users search by city, neighborhood, address, or ZIP code, browse businesses through Yelp, and view their locations on Google Maps.
 
 ## Screenshots
 
