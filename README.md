@@ -2,6 +2,18 @@
 
 An Android app for finding businesses by location through Yelp and viewing their locations on Google Maps.
 
+## Screenshots
+
+Captured from the running app on a Samsung phone using live Yelp results for Chicago and Google Maps.
+
+| Business discovery | Change the search location |
+| :---: | :---: |
+| <img src="docs/screenshots/discovery.png" width="260" alt="Coffee search results in Chicago with business photos, ratings, and category shortcuts"> | <img src="docs/screenshots/location-search.png" width="260" alt="Location editor with a city, address, or ZIP field and search action"> |
+
+| Business details | Google Maps |
+| :---: | :---: |
+| <img src="docs/screenshots/business-details.png" width="260" alt="Business photo, rating, address, phone number, and map action"> | <img src="docs/screenshots/google-maps.png" width="260" alt="Loaded Google map with the selected business marker and address"> |
+
 ## Run the app
 
 1. Open the project in Android Studio with support for Android Gradle Plugin 9.4.
@@ -80,11 +92,5 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
 Device tests save UI screenshots under the app's external-files `screenshots` directory. These screenshots contain test fixtures, not live business results. Live Yelp authorization, quotas, and Google Maps authorization require valid service configuration and separate verification.
 
 GitHub Actions runs formatting checks, unit tests, lint, and a debug build without credentials. Dependency versions are in `gradle/libs.versions.toml`.
-
-## Design references
-
-The native Android splash screen transitions into a discovery screen with a location header, category tiles, a photographic result grid. Detail screens keep the map action within reach. Light and dark colors share the same structure, and larger text switches the grids to one column.
-
-The final UI follows Stefan's [Yelp app reference collection on Dribbble](https://dribbble.com/search/yelp-app), particularly Sk Raju Hossin's [Local Businesses with Reviews App](https://dribbble.com/shots/25863556-Local-Businesses-with-Reviews-App). The reusable [Figma Community mobile design library](https://www.figma.com/community/mobile-apps?resource_type=files&editor_type=figma) remains a source for future work.
 
 Created by Stefan Bayne.
