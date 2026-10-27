@@ -1,54 +1,59 @@
 package com.example.yelpclone.di
 
-import com.example.yelpclone.core.util.DispatcherProvider
-import com.example.yelpclone.data.api.YelpApiService
-import com.example.yelpclone.data.api.YelpRetrofitInstance
-import com.example.yelpclone.data.api.UserRetrofitInstance
-import com.example.yelpclone.data.api.UserApiService
-import com.example.yelpclone.data.api.RepositoryImpl
-import com.example.yelpclone.data.api.UserRepositoryImpl
+import com.example.yelpclone.BuildConfig
+import com.example.yelpclone.data.business.repository.DefaultBusinessRepository
+import com.example.yelpclone.data.business.source.BusinessApi
+import com.example.yelpclone.domain.business.repository.BusinessRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
-/*
-Dependency Injection module
+/**
+ * Constructs shared HTTP dependencies and binds feature repository contracts for Hilt.
+ *
+ * @author Stefan Bayne
+ * @since 2023-04-23
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Singleton
     @Provides
-    fun provideYelpApiService(): YelpApiService = YelpRetrofitInstance.retrofit
+    @Named("yelpKey")
+    fun yelpKey(): String = BuildConfig.YELP_API_KEY
 
-    @Singleton
     @Provides
-    fun provideUserApiService(): UserApiService = UserRetrofitInstance.userRetrofit
-
     @Singleton
-    @Provides
-    fun provideYelpRepository(yelpApiService: YelpApiService): RepositoryImpl = RepositoryImpl(yelpApiService)
-
-    @Singleton
-    @Provides
-    fun provideUserRepository(userApiService: UserApiService): UserRepositoryImpl =
-        UserRepositoryImpl(userApiService)
-
-    @Singleton
-    @Provides
-    fun providesDispatcherProvider(): DispatcherProvider = object : DispatcherProvider {
-        override val mainCD: CoroutineDispatcher
-            get() = Dispatchers.Main
-        override val ioCD: CoroutineDispatcher
-            get() = Dispatchers.IO
-        override val defaultCD: CoroutineDispatcher
-            get() = Dispatchers.Default
-        override val unconfinedCD: CoroutineDispatcher
-            get() = Dispatchers.Unconfined
+    fun httpClient(): OkHttpClient {
+        val logging =
+            HttpLoggingInterceptor().apply {
+                redactHeader("Authorization")
+                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+            }
+        return OkHttpClient.Builder().addInterceptor(logging).build()
     }
+
+    @Provides
+    @Singleton
+    fun businessApi(client: OkHttpClient): BusinessApi =
+        retrofit("https://api.yelp.com/v3/", client).create(BusinessApi::class.java)
+
+    @Provides fun businessRepository(repository: DefaultBusinessRepository): BusinessRepository = repository
+
+    private fun retrofit(
+        url: String,
+        client: OkHttpClient,
+    ): Retrofit =
+        Retrofit
+            .Builder()
+            .baseUrl(url)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 }

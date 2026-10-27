@@ -1,70 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.view.activity.YelpActivity">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    android:orientation="vertical">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/toolBar"
-            android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="@color/surface"
+        app:menu="@menu/location_menu"
+        app:subtitle="@string/search_location"
+        app:logo="@drawable/ic_location"
+        app:titleTextColor="@color/ink"
+        app:subtitleTextColor="@color/muted" />
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/search_background"
+        app:queryBackground="@null"
+        app:iconifiedByDefault="false"
+        app:queryHint="@string/search_places"
+        android:inputType="textCapSentences"
+        android:imeOptions="actionSearch" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/restaurants"
+            style="@style/CategoryButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="82dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/restaurants"
+            app:icon="@drawable/ic_dining" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/coffee"
+            style="@style/CategoryButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="82dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/coffee"
+            app:icon="@drawable/ic_coffee" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/brunch"
+            style="@style/CategoryButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="82dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/brunch"
+            app:icon="@drawable/ic_brunch" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pizza"
+            style="@style/CategoryButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="82dp"
+            android:layout_marginEnd="0dp"
+            android:text="@string/pizza"
+            app:icon="@drawable/ic_pizza" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/searchView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/topAppBar"
-                style="@style/Widget.MaterialComponents.Toolbar.Primary"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/tool_bar_menu"
-                app:title="Tampa Yelp List" />
-
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/toolBar"
-            app:layout_constraintBottom_toTopOf="@id/rv_yelp_list"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_yelp_list"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/searchView"
-            tools:listitem="@layout/yelp_list_item" />
-
-        <ProgressBar
-            android:id="@+id/pb_main"
+            android:id="@+id/discovery_heading"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            android:textColor="@color/ink" />
+        <TextView
+            android:id="@+id/result_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/no_results"
+            android:textSize="12sp"
+            android:textColor="@color/muted" />
+    </LinearLayout>
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
+    <LinearLayout
+        android:id="@+id/state_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_explore"
+            android:importantForAccessibility="no" />
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:textSize="16sp"
+            android:textColor="@color/muted"
+            android:accessibilityLiveRegion="polite" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/retry"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/no_results"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            android:layout_marginTop="16dp"
+            android:text="@string/retry" />
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/results"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="12dp"
+        android:clipToPadding="false" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        android:id="@+id/source_attribution"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="11sp"
+        android:textColor="@color/muted" />
+</LinearLayout>

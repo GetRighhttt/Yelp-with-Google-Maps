@@ -1,77 +1,90 @@
-## **Yelp & Google Maps**
+# Tampa Guide
 
-## **Introduction**
-Created this application a while ago to test out Google Maps. Essentially reads in the `Yelp Fusion` api and allows users to search locations in the Tampa Bay area. A user can then see where the location is located on Google Maps. (API Key is restricted)
+An Android app for finding businesses by location through Yelp and viewing their locations on Google Maps.
 
-## **Installation**
-To install Project Title, follow these steps:
+## Run the app
 
- 
-1. Have Android Studio downloaded.
-2. Clone the repository into Android Studio: **`git clone: git@github.com:GetRighhttt/Yelp-with-Google-Maps.git`**
+1. Open the project in Android Studio with support for Android Gradle Plugin 9.4.
+2. Use JDK 21 for Gradle. The app compiles to Java 17 bytecode.
+3. Install Android SDK 37 and SDK Build Tools 36.0.0.
+4. Copy `local.properties.example` to `local.properties`, set your Android SDK path, and add your Yelp and Google Maps keys. Environment variables named `YELP_API_KEY` and `MAPS_API_KEY` override the local values.
+5. Run the `app` configuration on Android 8.0 or newer.
 
-## **Usage**
+```sh
+./gradlew :app:assembleDebug
+```
 
-1. Open the project in Android Studio.
+The project also builds without API keys. Business search then displays a configuration message. Maps need a valid Android-restricted Maps SDK key; the map action is disabled when no key is configured. The app displays business coordinates; it does not request the device's location.
 
-2. Modify the source code to fit your needs.
+For a Maps authorization failure, enable Maps SDK for Android in the key's Google Cloud project and authorize `com.example.yelpclone` with the signing certificate used for the installed build. Obtain that certificate's SHA-1 with `./gradlew :app:signingReport`. See [Google's Android key setup guide](https://developers.google.com/maps/documentation/android-sdk/get-api-key).
 
-3. Build the project.
+Keys belong in ignored local configuration or the build environment. Values supplied to an Android build are still extractable from the APK. A published app should access Yelp through a backend that owns the Yelp credential. Keys previously committed to this repository remain in Git history and should be replaced before public distribution.
 
-4. Start the project.
+## MVVM ownership
 
-5. Use the project as desired.
+The app has one Gradle module. Business discovery has separate presentation, domain, and data packages:
 
-## **Contributing**
+```text
+com.example.yelpclone/
+  presentation/
+    business/              ViewModel and domain-to-presentation mapper
+      model/               Screen state and Parcelable display model
+      view/                Activities and list adapter
+    common/                Error resources and window insets
+  domain/
+    business/
+      model/               Business values without Android dependencies
+      repository/          BusinessRepository contract
+    common/                Repository outcomes and failure reasons
+  data/
+    business/
+      model/               Yelp response records
+      source/              Retrofit service
+      mapper/              Response-to-domain mapping
+      repository/          BusinessRepository implementation
+    network/               Shared transport failure handling
+  di/                      Application and Hilt composition root
+```
 
-1. Fork the repository.
+Activities collect screen state while started and forward actions to their ViewModels. ViewModels own requests, cancel replaced requests, and map domain values before publishing state. The location header opens an editor for a city, neighborhood, address, or ZIP code. Tampa is the starting location. Changing the location repeats the current business search there; category searches and retries use that same location. The editor validates Yelp's 250-character limit and keeps its draft during screen recreation.
 
-2. Create a new branch for your changes.
+Submitted search input and the chosen location survive Android recreating the process through `SavedStateHandle`.
 
-3. Make your changes.
+Repositories validate their boundaries, call Retrofit, and map response records into domain values. Cancellation propagates instead of becoming an error message. Domain contracts expose typed outcomes; presentation translates failures into screen errors and localized messages.
 
-4. Write tests to cover your changes.
+Details and maps render small presentation models passed through internal intents. Ordinary Android back navigation returns to the existing list and its ViewModel. Missing payloads close safely, and missing coordinates disable map navigation. No database or paging layer is needed for the current request-based screens.
 
-5. Run the tests to ensure they pass.
+## Formatting and checks
 
-6. Commit your changes.
+Kotlin source and build scripts follow `.editorconfig` and ktlint's official Kotlin style. Kotlin files have a responsibility KDoc with author and introduction date. XML uses four-space indentation and one attribute per line on longer declarations.
 
-7. Push your changes to your forked repository.
+```sh
+./gradlew formatKotlin
+./gradlew checkKotlinFormat :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+```
 
-8. Submit a pull request.
+Unit tests cover source mapping, credential validation, cancellation, saved input, and retry state. Device tests cover search, error recovery, back navigation, recreation, and missing navigation payloads. Hilt replaces live repositories with deterministic fixtures during device tests.
 
-## **Demo**
-#### Here is a list of all the features used in this application:
+With one emulator or device connected:
 
-- Google Maps
-- Swipe Mechanism
-- Search View
-- Design Patterns
-- Retrofit2
-- API(2)
-- Coroutines
-- Dagger-Hilt
-- MVVM
-- StateFlows
-- Coroutines
-- Sealed Classes
-- Intents: PutExtra
-- Glide
-- Recycler View
-- Animations
-- View Binding
-- Material3
-- Material Dialogs
-- Material Toolbar
-- Snackbar
-- Splash Screen
-<hr>
+```sh
+./gradlew :app:connectedDebugAndroidTest
+```
 
-https://github.com/GetRighhttt/Yelp-with-Google-Maps/assets/105057858/855e8370-0b57-4ef7-89ea-5c161443a905
+When several devices are connected, select the intended one explicitly:
 
-https://github.com/GetRighhttt/Yelp-with-Google-Maps/assets/105057858/456c160a-4d25-4503-8b4e-160b4050e347
+```sh
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
+```
 
+Device tests save UI screenshots under the app's external-files `screenshots` directory. These screenshots contain test fixtures, not live business results. Live Yelp authorization, quotas, and Google Maps authorization require valid service configuration and separate verification.
 
-## **Contact**
+GitHub Actions runs formatting checks, unit tests, lint, and a debug build without credentials. Dependency versions are in `gradle/libs.versions.toml`.
 
-If you have any questions or comments, please contact **stefanbusiness95@gmail.com**.
+## Design references
+
+The native Android splash screen transitions into a discovery screen with a location header, category tiles, a photographic result grid. Detail screens keep the map action within reach. Light and dark colors share the same structure, and larger text switches the grids to one column.
+
+The final UI follows Stefan's [Yelp app reference collection on Dribbble](https://dribbble.com/search/yelp-app), particularly Sk Raju Hossin's [Local Businesses with Reviews App](https://dribbble.com/shots/25863556-Local-Businesses-with-Reviews-App). The reusable [Figma Community mobile design library](https://www.figma.com/community/mobile-apps?resource_type=files&editor_type=figma) remains a source for future work.
+
+Created by Stefan Bayne.
